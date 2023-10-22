@@ -1,0 +1,49 @@
+---
+# tasks file for plays/roles/ssh
+
+# Ensure user/.ssh folder exits
+- name: Make {{ main_user }}/.ssh folder if needed
+  become: True
+  ansible.builtin.file: 
+    path: /home/{{ main_user }}/.ssh
+    owner: '{{ main_user }}'
+    group: sudo
+    mode: 0700
+    state: directory
+  when: ansible_os_family == "Debian"
+
+# Copy auth_keys 
+- name: Copy the authorized_keys file
+  become: True
+  ansible.builtin.copy: 
+    src: ssh/authorized_keys 
+    dest: /home/{{ main_user }}/.ssh/authorized_keys
+    owner: '{{ main_user }}'
+    group: sudo
+    mode: 0600
+  notify: restart sshd
+  when: ansible_os_family == "Debian"
+
+# Copy ssh_config
+- name: Copy the ssh_config file
+  become: True
+  ansible.builtin.copy: 
+    src: ssh/ssh_config.conf
+    dest: /etc/ssh/ssh_config.d/hard.conf
+    owner: root
+    group: root
+    mode: 0444
+  notify: restart sshd
+  when: ansible_os_family == "Debian"
+
+# Copy sshd_config
+- name: Copy the sshd_config file
+  become: True
+  ansible.builtin.copy: 
+    src: ssh/sshd_config.conf
+    dest: /etc/ssh/sshd_config.d/hard.conf
+    owner: root
+    group: root
+    mode: 0411
+  notify: restart sshd
+  when: ansible_os_family == "Debian"

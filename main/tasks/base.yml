@@ -1,0 +1,88 @@
+
+---
+# tasks file for base
+
+## Default user
+### In theory the server should be setup with default user 'dan' before I run ansible play against the machine. But because some plays will require specific user folders in /home/dan/ we will ensure the dan user exists and manually intervene if it doesn't
+
+- name: Ensure {{ main_user }} exists and is in sudo group
+  become: True
+  ansible.builtin.user:
+    name: '{{ main_user }}'
+    group: sudo 
+    groups: sudo 
+    shell: /bin/bash
+    append: yes
+
+## Install default tools
+
+# - name: Setup OSQuery Repo
+#   become: true
+#   when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian' 
+#   block: - name: osquery |no apt key
+#       ansible.builtin.get_url:
+#         url: https://pkg.osquery.io/deb/pubkey.gpg
+#         dest: /etc/apt/keyrings/osquery.asc
+
+#     - name: osquery | apt source
+#       ansible.builtin.apt_repository:
+#         repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/osquery.asc] https://pkg.osquery.io/deb deb main"
+#         state: present
+
+#- name: Setup Crowdsec repo
+#  become: true
+#  when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian' 
+#  block:
+#    - name: crowdsec |no apt key
+#      ansible.builtin.get_url:
+#        url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
+#        dest: /etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg 
+#
+#    - name: crowdsec | apt source
+#      ansible.builtin.apt_repository:
+#        repo: 
+#          - "deb [signed-by=/etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu jammy main"
+#          - deb-src [signed-by=/etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu jammy main"
+#        state: present
+
+- name: Install linux tools
+  become: True
+  ansible.builtin.apt:
+    name:
+      - htop
+      - tmux
+      - vim
+      - tree
+      - cron
+      - avahi-daemon
+      - unattended-upgrades 
+      - auditd 
+      - audispd-plugins
+      - ansible
+        #  - osquery
+      - git
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Enable unattend upgrades
+  become: True
+  ansible.builtin.service: 
+    name: unattended-upgrades
+    enabled: true
+    state: started
+
+# Set timezone
+- name: Set timezone to '{{ timezone }}'
+  become: true
+  community.general.timezone:
+    name: "{{ timezone }}"
+
+# Cron job to add ansible-pull to crontab
+- name: Add ansible-pull to crontab
+  become: True
+  ansible.builtin.cron:
+    name: "ansible-pull"
+    minute: "0"
+    hour: "4"
+    weekday: "0"
+    job: "ansible-pull -U '{{ ansible_pull_link }}'"

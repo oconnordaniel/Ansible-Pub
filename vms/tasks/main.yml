@@ -1,0 +1,17 @@
+---
+# tasks file for vms
+## Install vm tools
+- name: Install linux tools
+  become: True
+  apt:
+    name:
+     - qemu-guest-agent
+    state: present
+
+- name: Enable qemu-guest-agent
+  become: True
+  ansible.builtin.service: 
+    name: qemu-guest-agent
+    enabled: true
+    state: started
+  when: ansible_distribution == 'Ubuntu'

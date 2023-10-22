@@ -1,0 +1,21 @@
+all: 
+  hosts: 
+
+  children:
+    physical_servers:
+      hosts:
+        dans-nas.lan:
+        dans-pi.lan:
+      # Non Proxmox servers
+
+    virtual_machines:
+      hosts:
+        dans-server1.lan: 
+        dans-server2.lan: 
+        dans-server3.lan: 
+
+    proxmox:
+      hosts: 
+        dans-proxmox.lan:
+        dans-other-proxmox.lan:
+

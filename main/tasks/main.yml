@@ -1,0 +1,39 @@
+---
+
+- name: Ping all 
+  ansible.builtin.ping:
+  tags: ping
+
+- name: Updates
+  ansible.builtin.import_tasks: ./tasks/updates.yml
+  tags: updates
+
+- name: Base
+  ansible.builtin.import_tasks: ./tasks/base.yml
+  tags: 
+    - base
+    - full
+
+- name: SSH
+  ansible.builtin.import_tasks: ./tasks/ssh.yml
+  tags: 
+    - ssh
+    - full
+
+- name: Uncomplicated Firewall
+  ansible.builtin.import_tasks: ./tasks/ufw.yml
+  tags: 
+    - ufw
+    - full
+
+- name: Wazuh
+  ansible.builtin.import_tasks: ./tasks/wazuh.yml
+  tags: 
+    - wazuh
+    - full
+
+- name: Zabbix
+  ansible.builtin.import_tasks: ./tasks/zabbix.yml
+  tags: 
+    - zabbix
+    - full

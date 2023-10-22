@@ -1,0 +1,33 @@
+---
+# tasks file for ufw
+
+- name: Install UFW
+  become: true
+  ansible.builtin.package: 
+    name:
+      - ufw
+    state: present
+
+- name: Set policy to deny
+  become: true
+  community.general.ufw:
+    state: enabled
+    policy: deny
+  notify: reload ufw
+
+- name: Allow SSH
+  become: true
+  community.general.ufw:
+    rule: allow
+    port: ssh
+    src: '{{ item }}'
+    proto: tcp
+  loop: '{{ trusted_net }}'
+  notify: reload ufw
+
+- name: enable ufw
+  become: true
+  ansible.builtin.systemd:
+    name: ufw
+    state: started
+  notify: reload ufw

@@ -1,0 +1,18 @@
+---
+
+- hosts: all
+  gather_facts: true
+  become: true
+  roles:
+    - role: main
+  vars_files: 
+    - ./files/passwords.yml
+    
+- hosts: virtual_machines
+  gather_facts: true
+  become: true
+  roles:
+    - role: vms
+  vars_files: 
+    - ./files/passwords.yml
+  tags: vms

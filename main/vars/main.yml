@@ -1,0 +1,39 @@
+---
+# vars file for main
+
+vars_file: passwords.yml 
+
+# connection vars
+#ansible_user: dan
+ansible_become_pass: '{{ dans_server_pass }}'
+ansible_connection: ssh
+
+# Main vars
+main_user: dan
+timezone: "America/Denver"
+# timezone: "UTC"
+
+## List of programs to install
+
+tool_list:
+  - htop
+  - tmux
+  - vim
+  - tree
+  - cron
+  - avahi-daemon
+  - unattended-upgrades 
+  - auditd 
+  - audispd-plugins
+  - ansible
+  - osquery
+  - git
+#  - crowdsec 
+
+trusted_net:
+  - 10.10.10.0/24
+  - 10.10.1.0/24
+  - 100.0.0.0/8
+
+ansible_pull_link: "https://gitea.oconnordaniel.com/dan/ansible-pull.git"
+
